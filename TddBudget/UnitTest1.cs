@@ -19,7 +19,7 @@ public class Tests
     {
         _budgetRepo.GetAll().Returns(new List<Budget>()
         {
-            new Budget() { YearMonth = "202311", Amount = 31 }
+            new Budget() { YearMonth = "202311", Amount = 30 }
         });
 
         var actual = _budgetService.Query(new DateTime(2023,11,25), new DateTime(2023,11,25));
@@ -32,11 +32,25 @@ public class Tests
     {
         _budgetRepo.GetAll().Returns(new List<Budget>()
         {
-            new Budget() { YearMonth = "202311", Amount = 31 }
+            new Budget() { YearMonth = "202311", Amount = 30 }
         });
 
         var actual = _budgetService.Query(new DateTime(2023,11,25), new DateTime(2023,11,27));
         Assert.AreEqual(3,actual);
+            
+    }
+    
+    [Test]
+    public void cross_month()
+    {
+        _budgetRepo.GetAll().Returns(new List<Budget>()
+        {
+            new Budget() { YearMonth = "202311", Amount = 30 },
+            new Budget() { YearMonth = "202312", Amount = 310 }
+        });
+
+        var actual = _budgetService.Query(new DateTime(2023,11,30), new DateTime(2023,12,2));
+        Assert.AreEqual(21,actual);
             
     }
 }
