@@ -69,19 +69,10 @@ public class Budget
 
     public decimal GetAmount(int days)
     {
-        decimal budgetPerDay;
-        if (this == null)
-        {
-            budgetPerDay = 0;
-        }
-        else
-        {
-            var budgetDate = DateTime.ParseExact(YearMonth, "yyyyMM", null);
-            budgetPerDay = Amount /
+        var budgetDate = DateTime.ParseExact(YearMonth, "yyyyMM", null);
+        var budgetPerDay = Amount /
                            (decimal)DateTime.DaysInMonth(budgetDate.Year, budgetDate.Month);
-        }
 
-        var amount = budgetPerDay * days;
-        return amount;
+        return budgetPerDay * days;
     }
 }
