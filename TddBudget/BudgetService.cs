@@ -19,16 +19,20 @@ public class BudgetService
         var current = new DateTime(start.Year, start.Month, 1);
         while (current <= end)
         {
-            var firstDay = new DateTime(current.Year, current.Month, 1);
-            var lastDay = new DateTime(current.Year, current.Month,
-                DateTime.DaysInMonth(current.Year, current.Month));
+            var period = new Period
+            {
+                StartDate = start,
+                EndDate = end
+            };
+            var currentPeriod = new Period
+            {
+                StartDate = new DateTime(current.Year, current.Month, 1),
+                EndDate = new DateTime(current.Year, current.Month,
+                    DateTime.DaysInMonth(current.Year, current.Month))
+            };
 
-            var startDay = start > firstDay ? start : firstDay;
-            var endDay = end < lastDay ? end : lastDay;
-            var days = endDay.Day - startDay.Day + 1;
-
-            var budgetPerDay = GetBudgetPerDay(budgets, current.ToString("yyyyMM"));
-            sum += budgetPerDay * days;
+            var perDay = GetAmount(period, currentPeriod, budgets);
+            sum += perDay;
 
             current = current.AddMonths(1);
         }
@@ -36,14 +40,27 @@ public class BudgetService
         return sum;
     }
 
-    private static decimal GetBudgetPerDay(List<Budget> budgets, string yearMonth)
+    private static decimal GetAmount(Period period, Period currentPeriod, List<Budget> budgets)
     {
+        var startDay = period.StartDate > currentPeriod.StartDate ? period.StartDate : currentPeriod.StartDate;
+        var endDay = period.EndDate < currentPeriod.EndDate ? period.EndDate : currentPeriod.EndDate;
+        var days = endDay.Day - startDay.Day + 1;
+
+        var yearMonth = currentPeriod.StartDate.ToString("yyyyMM");
         var budgetDate = DateTime.ParseExact(yearMonth, "yyyyMM", null);
         var daysInMonth = DateTime.DaysInMonth(budgetDate.Year, budgetDate.Month);
         var monthBudget = budgets.FirstOrDefault(x => x.YearMonth == yearMonth) ??
                           new Budget { Amount = 0 };
-        return monthBudget.Amount / (decimal)daysInMonth;
+        var budgetPerDay = monthBudget.Amount / (decimal)daysInMonth;
+        var perDay = budgetPerDay * days;
+        return perDay;
     }
+}
+
+public class Period
+{
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
 }
 
 public interface IBudgetRepo
