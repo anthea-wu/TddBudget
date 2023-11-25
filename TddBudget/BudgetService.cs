@@ -22,30 +22,25 @@ public class BudgetService
             while (current <= end)
             {
                 DateTime currentDate;
+                int days;
                 if (start.ToString("yyyyMM") == current.ToString("yyyyMM"))
                 {
                     currentDate = start;
-                    var days = DateTime.DaysInMonth(currentDate.Year, currentDate.Month) - currentDate.Day + 1;
-
-                    var budgetPerDay = GetBudgetPerDay(currentDate, budgets);
-                    sum += budgetPerDay * days;
+                    days = DateTime.DaysInMonth(currentDate.Year, currentDate.Month) - currentDate.Day + 1;
                 }
                 else if (end.ToString("yyyyMM") == current.ToString("yyyyMM"))
                 {
                     currentDate = end;
-                    var days = currentDate.Day;
-
-                    var budgetPerDay = GetBudgetPerDay(currentDate, budgets);
-                    sum += budgetPerDay * days;
+                    days = currentDate.Day;
                 }
                 else
                 {
                     currentDate = current.AddMonths(1).AddDays(-1);
-                    var days = currentDate.Day;
-
-                    var budgetPerDay = GetBudgetPerDay(currentDate, budgets);
-                    sum += budgetPerDay * days;
+                    days = currentDate.Day;
                 }
+
+                var budgetPerDay = GetBudgetPerDay(currentDate, budgets);
+                sum += budgetPerDay * days;
 
                 current = current.AddMonths(1);
             }
