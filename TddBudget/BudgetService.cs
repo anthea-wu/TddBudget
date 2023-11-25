@@ -21,31 +21,15 @@ public class BudgetService
             var current = new DateTime(start.Year, start.Month, 1);
             while (current <= end)
             {
-                DateTime currentDate;
-                int days;
-                if (start.ToString("yyyyMM") == current.ToString("yyyyMM"))
-                {
-                    currentDate = start;
-                    var endDate = DateTime.DaysInMonth(currentDate.Year, currentDate.Month);
-                    var startDate = currentDate.Day;
-                    days = endDate - startDate + 1;
-                }
-                else if (end.ToString("yyyyMM") == current.ToString("yyyyMM"))
-                {
-                    currentDate = end;
-                    var endDate = currentDate.Day;
-                    var startDate = new DateTime(currentDate.Year, currentDate.Month, 1).Day;
-                    days = endDate - startDate + 1;
-                }
-                else
-                {
-                    currentDate = current.AddMonths(1).AddDays(-1);
-                    var endDate = currentDate.Day;
-                    var startDate = new DateTime(currentDate.Year, currentDate.Month, 1).Day;
-                    days = endDate - startDate + 1;
-                }
+                var firstDay = new DateTime(current.Year, current.Month, 1);
+                var lastDay = new DateTime(current.Year, current.Month,
+                    DateTime.DaysInMonth(current.Year, current.Month));
 
-                var budgetPerDay = GetBudgetPerDay(budgets, currentDate.ToString("yyyyMM"));
+                var startDay = start > firstDay ? start : firstDay;
+                var endDay = end < lastDay ? end : lastDay;
+                var days = endDay.Day - startDay.Day + 1;
+
+                var budgetPerDay = GetBudgetPerDay(budgets, current.ToString("yyyyMM"));
                 sum += budgetPerDay * days;
 
                 current = current.AddMonths(1);
