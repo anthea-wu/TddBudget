@@ -42,9 +42,7 @@ public class BudgetService
 
     private static decimal GetAmount(Period period, Period currentPeriod, List<Budget> budgets)
     {
-        var startDay = period.StartDate > currentPeriod.StartDate ? period.StartDate : currentPeriod.StartDate;
-        var endDay = period.EndDate < currentPeriod.EndDate ? period.EndDate : currentPeriod.EndDate;
-        var days = endDay.Day - startDay.Day + 1;
+        var days = period.GetIntervalDays(currentPeriod);
 
         var yearMonth = currentPeriod.StartDate.ToString("yyyyMM");
         var budgetDate = DateTime.ParseExact(yearMonth, "yyyyMM", null);
@@ -61,6 +59,13 @@ public class Period
 {
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
+
+    public int GetIntervalDays(Period currentPeriod)
+    {
+        var startDay = StartDate > currentPeriod.StartDate ? StartDate : currentPeriod.StartDate;
+        var endDay = EndDate < currentPeriod.EndDate ? EndDate : currentPeriod.EndDate;
+        return endDay.Day - startDay.Day + 1;
+    }
 }
 
 public interface IBudgetRepo
