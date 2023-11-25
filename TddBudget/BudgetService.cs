@@ -4,6 +4,11 @@ public class BudgetService
 {
     private IBudgetRepo _budgetRepo;
 
+    public BudgetService(IBudgetRepo budgetRepo)
+    {
+        _budgetRepo = budgetRepo;
+    }
+
     public decimal Query(DateTime start, DateTime end)
     {
         var budgets = _budgetRepo.GetAll();
@@ -11,7 +16,7 @@ public class BudgetService
         var budget = budgets
             .FirstOrDefault(x => x.YearMonth == startMonth) ?? new Budget() { Amount = 0 };
 
-        var totalDays = (end - start).TotalDays;
+        var totalDays = (end - start).TotalDays + 1;
         
         var daysInMonth = DateTime.DaysInMonth(start.Year, start.Month);
 
@@ -19,12 +24,12 @@ public class BudgetService
     }
 }
 
-internal interface IBudgetRepo
+public interface IBudgetRepo
 {
     List<Budget> GetAll();
 }
 
-internal class Budget
+public class Budget
 {
     public string YearMonth { get; set; }
     public int Amount { get; set; }
