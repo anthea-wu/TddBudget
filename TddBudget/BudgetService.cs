@@ -1,5 +1,27 @@
 namespace TddBudget;
 
+public class Period
+{
+    public DateTime _end;
+    public DateTime _start;
+
+    public Period(DateTime start, DateTime end)
+    {
+        _start = start;
+        _end = end;
+    }
+
+    public int GetIntervalDays(DateTime current)
+    {
+        var startDate = new DateTime(current.Year, current.Month, 1);
+        var endDate = new DateTime(current.Year, current.Month,
+            DateTime.DaysInMonth(current.Year, current.Month));
+        var endD = (_end < endDate ? _end : endDate).Day;
+        var startD = (_start > startDate ? _start : startDate).Day;
+        return endD - startD + 1;
+    }
+}
+
 public class BudgetService
 {
     private readonly IBudgetRepo _budgetRepo;
@@ -19,21 +41,9 @@ public class BudgetService
         var current = new DateTime(start.Year, start.Month, 1);
         while (current <= end)
         {
-            var period = new Period
-            {
-                StartDate = start,
-                EndDate = end
-            };
-            var currentPeriod = new Period
-            {
-                StartDate = new DateTime(current.Year, current.Month, 1),
-                EndDate = new DateTime(current.Year, current.Month,
-                    DateTime.DaysInMonth(current.Year, current.Month))
-            };
+            var monthlyBudget = budgets.FirstOrDefault(x => x.YearMonth == current.ToString("yyyyMM"));
 
-            var days = period.GetIntervalDays(currentPeriod);
-            var monthlyBudget = budgets.FirstOrDefault(x => x.YearMonth == currentPeriod.StartDate.ToString("yyyyMM"));
-
+            var days = new Period(start, end).GetIntervalDays(current);
             var amount = monthlyBudget?.GetAmount(days) ?? 0;
             sum += amount;
 
@@ -41,19 +51,6 @@ public class BudgetService
         }
 
         return sum;
-    }
-}
-
-public class Period
-{
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
-
-    public int GetIntervalDays(Period currentPeriod)
-    {
-        var startDay = StartDate > currentPeriod.StartDate ? StartDate : currentPeriod.StartDate;
-        var endDay = EndDate < currentPeriod.EndDate ? EndDate : currentPeriod.EndDate;
-        return endDay.Day - startDay.Day + 1;
     }
 }
 
