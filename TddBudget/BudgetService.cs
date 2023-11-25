@@ -16,36 +16,21 @@ public class BudgetService
         var budgets = _budgetRepo.GetAll();
         decimal sum = 0;
 
-        if (start.ToString("yyyyMM") != end.ToString("yyyyMM"))
+        var current = new DateTime(start.Year, start.Month, 1);
+        while (current <= end)
         {
-            var current = new DateTime(start.Year, start.Month, 1);
-            while (current <= end)
-            {
-                var firstDay = new DateTime(current.Year, current.Month, 1);
-                var lastDay = new DateTime(current.Year, current.Month,
-                    DateTime.DaysInMonth(current.Year, current.Month));
+            var firstDay = new DateTime(current.Year, current.Month, 1);
+            var lastDay = new DateTime(current.Year, current.Month,
+                DateTime.DaysInMonth(current.Year, current.Month));
 
-                var startDay = start > firstDay ? start : firstDay;
-                var endDay = end < lastDay ? end : lastDay;
-                var days = endDay.Day - startDay.Day + 1;
+            var startDay = start > firstDay ? start : firstDay;
+            var endDay = end < lastDay ? end : lastDay;
+            var days = endDay.Day - startDay.Day + 1;
 
-                var budgetPerDay = GetBudgetPerDay(budgets, current.ToString("yyyyMM"));
-                sum += budgetPerDay * days;
+            var budgetPerDay = GetBudgetPerDay(budgets, current.ToString("yyyyMM"));
+            sum += budgetPerDay * days;
 
-                current = current.AddMonths(1);
-            }
-        }
-        else
-        {
-            var startMonth = start.ToString("yyyyMM");
-            var startBudget = budgets
-                .FirstOrDefault(x => x.YearMonth == startMonth) ?? new Budget { Amount = 0 };
-
-            var totalDays = (end - start).Days + 1;
-            var daysInMonth = DateTime.DaysInMonth(start.Year, start.Month);
-
-            var startBudgetAmount = startBudget.Amount / (decimal)daysInMonth * totalDays;
-            sum += startBudgetAmount;
+            current = current.AddMonths(1);
         }
 
         return sum;
