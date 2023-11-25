@@ -64,4 +64,16 @@ public class Tests
         var actual = _budgetService.Query(new DateTime(2023, 11, 30), new DateTime(2024, 1, 2));
         Assert.AreEqual(3121, actual);
     }
+
+    [Test]
+    public void invalid_period()
+    {
+        _budgetRepo.GetAll().Returns(new List<Budget>()
+        {
+            new Budget() { YearMonth = "202311", Amount = 30 },
+        });
+
+        var actual = _budgetService.Query(new DateTime(2023, 11, 30), new DateTime(2023, 11, 21));
+        Assert.AreEqual(0, actual);
+    }
 }

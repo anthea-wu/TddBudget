@@ -11,6 +11,11 @@ public class BudgetService
 
     public decimal Query(DateTime start, DateTime end)
     {
+        if (end < start)
+        {
+            return 0;
+        }
+
         var budgets = _budgetRepo.GetAll();
         decimal sum = 0;
 
