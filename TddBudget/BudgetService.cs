@@ -4,7 +4,6 @@ public class BudgetService
 {
     private IBudgetRepo _budgetRepo;
 
-    // 同一天
     public decimal Query(DateTime start, DateTime end)
     {
         var budgets = _budgetRepo.GetAll();
@@ -12,9 +11,11 @@ public class BudgetService
         var budget = budgets
             .FirstOrDefault(x => x.YearMonth == startMonth) ?? new Budget() { Amount = 0 };
 
+        var totalDays = (end - start).TotalDays;
+        
         var daysInMonth = DateTime.DaysInMonth(start.Year, start.Month);
 
-        return budget.Amount / daysInMonth;
+        return (decimal)(budget.Amount / daysInMonth * totalDays);
     }
 }
 
