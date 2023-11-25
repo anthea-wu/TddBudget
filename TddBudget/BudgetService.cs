@@ -25,35 +25,26 @@ public class BudgetService
                 if (start.ToString("yyyyMM") == current.ToString("yyyyMM"))
                 {
                     currentDate = start;
-                    var yearMonth = currentDate.ToString("yyyyMM");
-                    var monthBudget = budgets.FirstOrDefault(x => x.YearMonth == yearMonth) ??
-                                      new Budget { Amount = 0 };
-                    var daysInMonth = DateTime.DaysInMonth(currentDate.Year, currentDate.Month);
-                    var days = daysInMonth - currentDate.Day + 1;
+                    var days = DateTime.DaysInMonth(currentDate.Year, currentDate.Month) - currentDate.Day + 1;
 
-                    sum += monthBudget.Amount / (decimal)daysInMonth * days;
+                    var budgetPerDay = GetBudgetPerDay(currentDate, budgets);
+                    sum += budgetPerDay * days;
                 }
                 else if (end.ToString("yyyyMM") == current.ToString("yyyyMM"))
                 {
                     currentDate = end;
-                    var yearMonth = currentDate.ToString("yyyyMM");
-                    var monthBudget = budgets.FirstOrDefault(x => x.YearMonth == yearMonth) ??
-                                      new Budget { Amount = 0 };
-                    var daysInMonth = DateTime.DaysInMonth(currentDate.Year, currentDate.Month);
                     var days = currentDate.Day;
 
-                    sum += monthBudget.Amount / (decimal)daysInMonth * days;
+                    var budgetPerDay = GetBudgetPerDay(currentDate, budgets);
+                    sum += budgetPerDay * days;
                 }
                 else
                 {
                     currentDate = current.AddMonths(1).AddDays(-1);
-                    var yearMonth = currentDate.ToString("yyyyMM");
-                    var monthBudget = budgets.FirstOrDefault(x => x.YearMonth == yearMonth) ??
-                                      new Budget { Amount = 0 };
-                    var daysInMonth = DateTime.DaysInMonth(currentDate.Year, currentDate.Month);
                     var days = currentDate.Day;
 
-                    sum += monthBudget.Amount / (decimal)daysInMonth * days;
+                    var budgetPerDay = GetBudgetPerDay(currentDate, budgets);
+                    sum += budgetPerDay * days;
                 }
 
                 current = current.AddMonths(1);
@@ -73,6 +64,15 @@ public class BudgetService
         }
 
         return sum;
+    }
+
+    private static decimal GetBudgetPerDay(DateTime currentDate, List<Budget> budgets)
+    {
+        var daysInMonth = DateTime.DaysInMonth(currentDate.Year, currentDate.Month);
+        var yearMonth = currentDate.ToString("yyyyMM");
+        var monthBudget = budgets.FirstOrDefault(x => x.YearMonth == yearMonth) ??
+                          new Budget { Amount = 0 };
+        return monthBudget.Amount / (decimal)daysInMonth;
     }
 }
 
