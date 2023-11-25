@@ -16,20 +16,11 @@ public class BudgetService
 
         if (start.ToString("yyyyMM") != end.ToString("yyyyMM"))
         {
-            var endMonth = end.ToString("yyyyMM");
-            var endBudget = budgets.FirstOrDefault(x => x.YearMonth == endMonth) ?? new Budget() { Amount = 0 };
-            var endMonthDays = end.Day;
-            var daysInEndMonth = DateTime.DaysInMonth(end.Year, end.Month);
-            var endBudgetAmount = endBudget.Amount / (decimal)daysInEndMonth * endMonthDays;
-            sum += endBudgetAmount;
-
-            var startMonth = start.ToString("yyyyMM");
-            var startBudget = budgets
-                .FirstOrDefault(x => x.YearMonth == startMonth) ?? new Budget() { Amount = 0 };
-            var daysInMonth = DateTime.DaysInMonth(start.Year, start.Month);
-            var totalDays = daysInMonth - start.Day + 1;
-            var startBudgetAmount = (startBudget.Amount / (decimal)daysInMonth * totalDays);
+            var startBudgetAmount = StartBudgetAmount(start, budgets, true);
             sum += startBudgetAmount;
+
+            var endBudgetAmount = StartBudgetAmount(end, budgets, false);
+            sum += endBudgetAmount;
         }
         else
         {
@@ -45,6 +36,25 @@ public class BudgetService
         }
 
         return sum;
+    }
+
+    private static decimal StartBudgetAmount(DateTime start, List<Budget> budgets, bool isStart)
+    {
+        var startMonth = start.ToString("yyyyMM");
+        var startBudget = budgets.FirstOrDefault(x => x.YearMonth == startMonth) ?? new Budget() { Amount = 0 };
+        var daysInMonth = DateTime.DaysInMonth(start.Year, start.Month);
+        int startMonthDays = 0;
+        if (isStart)
+        {
+            startMonthDays = daysInMonth - start.Day + 1;
+        }
+        else
+        {
+            startMonthDays = start.Day;
+        }
+
+        var startBudgetAmount = (startBudget.Amount / (decimal)daysInMonth * startMonthDays);
+        return startBudgetAmount;
     }
 }
 
