@@ -31,27 +31,16 @@ public class BudgetService
                     DateTime.DaysInMonth(current.Year, current.Month))
             };
 
-            var perDay = GetAmount(period, currentPeriod, budgets);
-            sum += perDay;
+            var days = period.GetIntervalDays(currentPeriod);
+            var monthlyBudget = budgets.FirstOrDefault(x => x.YearMonth == currentPeriod.StartDate.ToString("yyyyMM"));
+
+            var amount = monthlyBudget?.GetAmount(days) ?? 0;
+            sum += amount;
 
             current = current.AddMonths(1);
         }
 
         return sum;
-    }
-
-    private static decimal GetAmount(Period period, Period currentPeriod, List<Budget> budgets)
-    {
-        var days = period.GetIntervalDays(currentPeriod);
-
-        var yearMonth = currentPeriod.StartDate.ToString("yyyyMM");
-        var budgetDate = DateTime.ParseExact(yearMonth, "yyyyMM", null);
-        var daysInMonth = DateTime.DaysInMonth(budgetDate.Year, budgetDate.Month);
-        var monthBudget = budgets.FirstOrDefault(x => x.YearMonth == yearMonth) ??
-                          new Budget { Amount = 0 };
-        var budgetPerDay = monthBudget.Amount / (decimal)daysInMonth;
-        var perDay = budgetPerDay * days;
-        return perDay;
     }
 }
 
@@ -77,4 +66,22 @@ public class Budget
 {
     public string YearMonth { get; set; }
     public int Amount { get; set; }
+
+    public decimal GetAmount(int days)
+    {
+        decimal budgetPerDay;
+        if (this == null)
+        {
+            budgetPerDay = 0;
+        }
+        else
+        {
+            var budgetDate = DateTime.ParseExact(YearMonth, "yyyyMM", null);
+            budgetPerDay = Amount /
+                           (decimal)DateTime.DaysInMonth(budgetDate.Year, budgetDate.Month);
+        }
+
+        var amount = budgetPerDay * days;
+        return amount;
+    }
 }
