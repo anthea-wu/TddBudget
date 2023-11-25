@@ -19,7 +19,7 @@ public class BudgetService
         if (start.ToString("yyyyMM") != end.ToString("yyyyMM"))
         {
             var loop = new DateTime(start.Year, start.Month, 1);
-            while (end > loop)
+            while (loop <= end)
             {
                 var isStart = start.ToString("yyyyMM") == loop.ToString("yyyyMM");
                 if (isStart)
