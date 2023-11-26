@@ -35,11 +35,11 @@ public class BudgetService
     {
         if (end < start) return 0;
 
-        var budgets = _budgetRepo.GetAll();
         decimal sum = 0;
+        var current = start;
+        var budgets = _budgetRepo.GetAll();
 
-        var current = new DateTime(start.Year, start.Month, 1);
-        while (current <= end)
+        while (current < new DateTime(end.Year, end.Month, 1).AddMonths(1))
         {
             var monthlyBudget = budgets.FirstOrDefault(x => x.YearMonth == current.ToString("yyyyMM"));
 
