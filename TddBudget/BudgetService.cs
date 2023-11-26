@@ -2,8 +2,8 @@ namespace TddBudget;
 
 public class Period
 {
-    public DateTime _end;
-    public DateTime _start;
+    private readonly DateTime _start;
+    private readonly DateTime _end;
 
     public Period(DateTime start, DateTime end)
     {
@@ -11,12 +11,11 @@ public class Period
         _end = end;
     }
 
-    public int GetOverlappingDays(Period budgetPeriod)
+    public int GetOverlappingDays(Period another)
     {
-        var endD = _end < budgetPeriod._end ? _end : budgetPeriod._end;
-        var startD = _start > budgetPeriod._start ? _start : budgetPeriod._start;
-        var days = (endD - startD).Days + 1;
-        return days;
+        var minEnd = _end < another._end ? _end : another._end;
+        var maxStart = _start > another._start ? _start : another._start;
+        return (minEnd - maxStart).Days + 1;
     }
 }
 
