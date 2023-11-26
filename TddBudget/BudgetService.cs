@@ -2,8 +2,8 @@ namespace TddBudget;
 
 public class Period
 {
-    private readonly DateTime _start;
     private readonly DateTime _end;
+    private readonly DateTime _start;
 
     public Period(DateTime start, DateTime end)
     {
@@ -40,12 +40,7 @@ public class BudgetService
         while (current < new DateTime(end.Year, end.Month, 1).AddMonths(1))
         {
             var budget = budgets.FirstOrDefault(x => x.YearMonth == current.ToString("yyyyMM"));
-            if (budget != null)
-            {
-                var days = period.GetOverlappingDays(budget.Period());
-                var budgetPerDay = budget.GetBudgetPerDay();
-                sum += budgetPerDay * days;
-            }
+            if (budget != null) sum += budget.OverlappingAmount(period);
 
             current = current.AddMonths(1);
         }
@@ -85,5 +80,10 @@ public class Budget
     public Period Period()
     {
         return new Period(FirstDay(), LastDay());
+    }
+
+    public decimal OverlappingAmount(Period period)
+    {
+        return GetBudgetPerDay() * period.GetOverlappingDays(Period());
     }
 }
