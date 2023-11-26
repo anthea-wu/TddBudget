@@ -42,10 +42,13 @@ public class BudgetService
         while (current < new DateTime(end.Year, end.Month, 1).AddMonths(1))
         {
             var monthlyBudget = budgets.FirstOrDefault(x => x.YearMonth == current.ToString("yyyyMM"));
+            if (monthlyBudget != null)
+            {
+                var days = new Period(start, end).GetIntervalDays(current);
+                var budgetPerDay = monthlyBudget.GetBudgetPerDay();
+                sum += budgetPerDay * days;
+            }
 
-            var days = new Period(start, end).GetIntervalDays(current);
-            var amount = monthlyBudget?.GetAmount(days) ?? 0;
-            sum += amount;
 
             current = current.AddMonths(1);
         }
@@ -64,12 +67,10 @@ public class Budget
     public string YearMonth { get; set; }
     public int Amount { get; set; }
 
-    public decimal GetAmount(int days)
+    public decimal GetBudgetPerDay()
     {
         var budgetDate = DateTime.ParseExact(YearMonth, "yyyyMM", null);
-        var budgetPerDay = Amount /
-                           (decimal)DateTime.DaysInMonth(budgetDate.Year, budgetDate.Month);
-
-        return budgetPerDay * days;
+        var daysInMonth = DateTime.DaysInMonth(budgetDate.Year, budgetDate.Month);
+        return (decimal)Amount / daysInMonth;
     }
 }
