@@ -36,13 +36,13 @@ public class BudgetService
         var current = start;
         var budgets = _budgetRepo.GetAll();
 
+        var period = new Period(start, end);
         while (current < new DateTime(end.Year, end.Month, 1).AddMonths(1))
         {
             var budget = budgets.FirstOrDefault(x => x.YearMonth == current.ToString("yyyyMM"));
             if (budget != null)
             {
-                var period = new Period(start, end);
-                var days = period.GetOverlappingDays(new Period(budget.FirstDay(), budget.LastDay()));
+                var days = period.GetOverlappingDays(budget.Period());
                 var budgetPerDay = budget.GetBudgetPerDay();
                 sum += budgetPerDay * days;
             }
@@ -80,5 +80,10 @@ public class Budget
     {
         return new DateTime(FirstDay().Year, FirstDay().Month,
             DateTime.DaysInMonth(FirstDay().Year, FirstDay().Month));
+    }
+
+    public Period Period()
+    {
+        return new Period(FirstDay(), LastDay());
     }
 }
