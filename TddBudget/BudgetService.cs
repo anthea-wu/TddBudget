@@ -16,9 +16,9 @@ public class Period
         var startDate = new DateTime(current.Year, current.Month, 1);
         var endDate = new DateTime(current.Year, current.Month,
             DateTime.DaysInMonth(current.Year, current.Month));
-        var endD = (_end < endDate ? _end : endDate).Day;
-        var startD = (_start > startDate ? _start : startDate).Day;
-        return endD - startD + 1;
+        var endD = _end < endDate ? _end : endDate;
+        var startD = _start > startDate ? _start : startDate;
+        return (endD - startD).Days + 1;
     }
 }
 
