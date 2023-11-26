@@ -31,21 +31,7 @@ public class BudgetService
     public decimal Query(DateTime start, DateTime end)
     {
         if (end < start) return 0;
-
-        decimal sum = 0;
-        var current = start;
-        var budgets = _budgetRepo.GetAll();
-
-        var period = new Period(start, end);
-        while (current < new DateTime(end.Year, end.Month, 1).AddMonths(1))
-        {
-            var budget = budgets.FirstOrDefault(x => x.YearMonth == current.ToString("yyyyMM"));
-            if (budget != null) sum += budget.OverlappingAmount(period);
-
-            current = current.AddMonths(1);
-        }
-
-        return sum;
+        return _budgetRepo.GetAll().Sum(budget => budget.OverlappingAmount(new Period(start, end)));
     }
 }
 
