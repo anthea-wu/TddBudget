@@ -15,9 +15,9 @@ public class Tests
     }
 
     [Test]
-    public void sameday()
+    public void one_day_budget()
     {
-        _budgetRepo.GetAll().Returns(new List<Budget>
+        GivenBudgets(new List<Budget>
         {
             new() { YearMonth = "202311", Amount = 30 }
         });
@@ -27,9 +27,9 @@ public class Tests
     }
 
     [Test]
-    public void samemonth()
+    public void multiple_days_budget_in_same_month()
     {
-        _budgetRepo.GetAll().Returns(new List<Budget>
+        GivenBudgets(new List<Budget>
         {
             new() { YearMonth = "202311", Amount = 30 }
         });
@@ -39,9 +39,9 @@ public class Tests
     }
 
     [Test]
-    public void cross_month()
+    public void multiple_days_budget_cross_month()
     {
-        _budgetRepo.GetAll().Returns(new List<Budget>
+        GivenBudgets(new List<Budget>
         {
             new() { YearMonth = "202311", Amount = 30 },
             new() { YearMonth = "202312", Amount = 310 }
@@ -52,9 +52,9 @@ public class Tests
     }
 
     [Test]
-    public void cross_three_month()
+    public void multiple_days_budget_cross_three_month()
     {
-        _budgetRepo.GetAll().Returns(new List<Budget>
+        GivenBudgets(new List<Budget>
         {
             new() { YearMonth = "202311", Amount = 30 },
             new() { YearMonth = "202312", Amount = 3100 },
@@ -66,9 +66,9 @@ public class Tests
     }
 
     [Test]
-    public void no_budget()
+    public void no_budget_should_get_0()
     {
-        _budgetRepo.GetAll().Returns(new List<Budget>());
+        GivenBudgets(new List<Budget>());
 
         var actual = _budgetService.Query(new DateTime(2023, 11, 30), new DateTime(2024, 1, 2));
         Assert.AreEqual(0, actual);
@@ -76,14 +76,19 @@ public class Tests
 
 
     [Test]
-    public void invalid_period()
+    public void invalid_period_should_get_0()
     {
-        _budgetRepo.GetAll().Returns(new List<Budget>
+        GivenBudgets(new List<Budget>
         {
             new() { YearMonth = "202311", Amount = 30 }
         });
 
         var actual = _budgetService.Query(new DateTime(2023, 11, 30), new DateTime(2023, 11, 21));
         Assert.AreEqual(0, actual);
+    }
+
+    private void GivenBudgets(List<Budget> budgets)
+    {
+        _budgetRepo.GetAll().Returns(budgets);
     }
 }
