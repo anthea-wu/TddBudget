@@ -45,25 +45,28 @@ public class Budget
     public string YearMonth { get; set; }
     public int Amount { get; set; }
 
-    public decimal GetBudgetPerDay()
+    private decimal GetBudgetPerDay()
     {
-        var budgetFirstDay = FirstDay();
-        var daysInMonth = DateTime.DaysInMonth(budgetFirstDay.Year, budgetFirstDay.Month);
+        var daysInMonth = Days();
         return (decimal)Amount / daysInMonth;
     }
 
-    public DateTime FirstDay()
+    private int Days()
+    {
+        return DateTime.DaysInMonth(FirstDay().Year, FirstDay().Month);
+    }
+
+    private DateTime FirstDay()
     {
         return DateTime.ParseExact(YearMonth, "yyyyMM", null);
     }
 
-    public DateTime LastDay()
+    private DateTime LastDay()
     {
-        return new DateTime(FirstDay().Year, FirstDay().Month,
-            DateTime.DaysInMonth(FirstDay().Year, FirstDay().Month));
+        return new DateTime(FirstDay().Year, FirstDay().Month, Days());
     }
 
-    public Period Period()
+    private Period Period()
     {
         return new Period(FirstDay(), LastDay());
     }
