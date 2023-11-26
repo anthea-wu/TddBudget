@@ -11,14 +11,12 @@ public class Period
         _end = end;
     }
 
-    public int GetIntervalDays(DateTime current)
+    public int GetOverlappingDays(Period budgetPeriod)
     {
-        var startDate = new DateTime(current.Year, current.Month, 1);
-        var endDate = new DateTime(current.Year, current.Month,
-            DateTime.DaysInMonth(current.Year, current.Month));
-        var endD = _end < endDate ? _end : endDate;
-        var startD = _start > startDate ? _start : startDate;
-        return (endD - startD).Days + 1;
+        var endD = _end < budgetPeriod._end ? _end : budgetPeriod._end;
+        var startD = _start > budgetPeriod._start ? _start : budgetPeriod._start;
+        var days = (endD - startD).Days + 1;
+        return days;
     }
 }
 
@@ -41,14 +39,14 @@ public class BudgetService
 
         while (current < new DateTime(end.Year, end.Month, 1).AddMonths(1))
         {
-            var monthlyBudget = budgets.FirstOrDefault(x => x.YearMonth == current.ToString("yyyyMM"));
-            if (monthlyBudget != null)
+            var budget = budgets.FirstOrDefault(x => x.YearMonth == current.ToString("yyyyMM"));
+            if (budget != null)
             {
-                var days = new Period(start, end).GetIntervalDays(current);
-                var budgetPerDay = monthlyBudget.GetBudgetPerDay();
+                var period = new Period(start, end);
+                var days = period.GetOverlappingDays(new Period(budget.FirstDay(), budget.LastDay()));
+                var budgetPerDay = budget.GetBudgetPerDay();
                 sum += budgetPerDay * days;
             }
-
 
             current = current.AddMonths(1);
         }
@@ -69,8 +67,19 @@ public class Budget
 
     public decimal GetBudgetPerDay()
     {
-        var budgetDate = DateTime.ParseExact(YearMonth, "yyyyMM", null);
-        var daysInMonth = DateTime.DaysInMonth(budgetDate.Year, budgetDate.Month);
+        var budgetFirstDay = FirstDay();
+        var daysInMonth = DateTime.DaysInMonth(budgetFirstDay.Year, budgetFirstDay.Month);
         return (decimal)Amount / daysInMonth;
+    }
+
+    public DateTime FirstDay()
+    {
+        return DateTime.ParseExact(YearMonth, "yyyyMM", null);
+    }
+
+    public DateTime LastDay()
+    {
+        return new DateTime(FirstDay().Year, FirstDay().Month,
+            DateTime.DaysInMonth(FirstDay().Year, FirstDay().Month));
     }
 }
